@@ -12,20 +12,22 @@ class AutentikasiController extends Controller
         $validated = $request->validate([
             'email' => 'required|exists:users',
             'password' => 'required'
+        ],[
+            'email.required'=>'Email kosong!',
+            'email.exists'=>'Email tidak terdaftar',
+            'password.required'=>'Password kosong!'
         ]);
         if (Auth::attempt($validated)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard')->with('success', 'Login berhasil');
+            return redirect()->route('login')->with('loginSuccess', 'Login berhasil!');
         } else {
-            return back()->withErrors([
-                'error' => 'Email atau password salah',
-            ])->withInput();
+            return back()->with('error', 'Kesalahan kredensial');
         }
     }
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
-        return redirect('login')->with('success', 'Berhasil logout');
+        return redirect('/')->with('success', 'Berhasil logout');
     }
 }

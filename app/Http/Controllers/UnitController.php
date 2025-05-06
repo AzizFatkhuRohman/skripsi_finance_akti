@@ -23,7 +23,11 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_unit' => 'required|max:255|unique:units'
+            'nama_unit' => 'required|max:255|unique:unit'
+        ], [
+            'nama_unit.required' => 'Unit kosong!',
+            'nama_unit.max' => 'Maksimal 255 karakter',
+            'nama_unit.unique' => 'Nama unit sudah digunakan'
         ]);
         $this->unit->Store($validated);
         return back()->with('success', 'Unit berhasil dibuat');
@@ -35,14 +39,17 @@ class UnitController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama_unit' => 'required|max:255'
+            'nama_unit' => 'required|max:255|unique:unit'
+        ], [
+            'nama_unit.required' => 'Unit kosong!',
+            'nama_unit.max' => 'Maksimal 255 karakter',
+            'nama_unit.unique' => 'Nama unit sudah digunakan'
         ]);
         $this->unit->Edit($id, $validated);
-        return back()->with('success','Unit berhasil dibuat');
+        return back()->with('success', 'Unit berhasil diubah');
     }
     public function destroy($id)
     {
         $this->unit->Del($id);
-        return back()->with('success','Unit berhasil dihapus');
     }
 }

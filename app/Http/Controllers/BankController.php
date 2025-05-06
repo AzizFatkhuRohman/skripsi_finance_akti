@@ -23,8 +23,14 @@ class BankController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_bank' => 'required|digits:3|unique:banks',
-            'nama_bank' => 'required|max:50|unique:banks'
+            'kode_bank' => 'required|digits:3|unique:bank',
+            'nama_bank' => 'required|max:50|unique:bank'
+        ],[
+            'kode_bank.required'=>'Kode bank kosong',
+            'kode_bank.digits'=>'Kode bank harus 3 digit',
+            'kode_bank.unique'=>'Kode bank sudah digunakan',
+            'nama_bank.max'=>'Nama bank maksimum 50 karakter',
+            'nama_bank.unique'=>'Nama bank sudah digunakan'
         ]);
         $this->bank->Store($validated);
         return back()->with('success','Bank berhasil dibuat');
@@ -36,8 +42,14 @@ class BankController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'kode_bank' => 'required|digits:3',
-            'nama_bank' => 'required|max:50'
+           'kode_bank' => 'required|digits:3|unique:bank',
+            'nama_bank' => 'required|max:50|unique:bank'
+        ],[
+            'kode_bank.required'=>'Kode bank kosong',
+            'kode_bank.digits'=>'Kode bank harus 3 digit',
+            'kode_bank.unique'=>'Kode bank sudah digunakan',
+            'nama_bank.max'=>'Nama bank maksimum 50 karakter',
+            'nama_bank.unique'=>'Nama bank sudah digunakan'
         ]);
         $this->bank->Edit($id, $validated);
         return back()->with('success','Bank berhasil diubah');
@@ -45,6 +57,5 @@ class BankController extends Controller
     public function destroy($id)
     {
         $this->bank->Del($id);
-        return back()->with('success','Bank berhasil dihapus');
     }
 }

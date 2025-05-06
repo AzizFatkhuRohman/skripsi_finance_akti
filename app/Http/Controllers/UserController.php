@@ -25,12 +25,17 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'email' => 'required|max:225|email|unique:users',
-            'password' => 'required|min:6|max:225',
             'role' => 'required'
+        ],[
+            'email.required'=>'Email kosong',
+            'email.max'=>'Email maksimum 255 karakter',
+            'email.email'=>'Email harus bertipe mail',
+            'email.unique'=>'Email sudah digunakan',
+            'role.required'=>'Role kosong'
         ]);
         $this->user->Store([
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make('Akti2015'),
             'role' => $validated['role'],
         ]);
         return back()->with('success', 'User berhasil dibuat');
