@@ -15,11 +15,13 @@ class UserController extends Controller
     }
     public function index()
     {
-        return view('user.index');
+        return inertia('User/User',[
+            'data'=>$this->user->Index()
+        ]);
     }
     public function create()
     {
-        return view('user.create');
+        return inertia('User/CreateUser');
     }
     public function store(Request $request)
     {
@@ -38,29 +40,42 @@ class UserController extends Controller
             'password' => Hash::make('Akti2015'),
             'role' => $validated['role'],
         ]);
-        return back()->with('success', 'User berhasil dibuat');
+        return back()->with('message', 'User berhasil dibuat');
     }
     public function show(string $id)
     {
-        return view('user.show', ['data' => $this->user->Show($id)]);
+        return inertia('User/ShowUser', [
+            'data' => $this->user->Show($id)
+        ]);
     }
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
             'email' => 'required|max:225|email',
-            'password' => 'required|min:6|max:225',
             'role' => 'required'
+        ],[
+            'email.required'=>'Email kosong',
+            'email.max'=>'Email maksimum 225 karakter',
+            'email.email'=>'Tipe email',
+            'role.required'=>'Role kosong'
         ]);
         $this->user->Edit($id, [
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
         ]);
-        return back()->with('success', 'User berhasil diubah');
+        return redirect('/admin/user')->with('message', 'User berhasil diubah');
     }
     public function destroy(string $id)
     {
         $this->user->Del($id);
-        return back()->with('success', 'User berhasil dihapus');
+        return back()->with('message', 'User berhasil dihapus');
+    }
+    public function Password(Request $request, $id){
+        $validated = $request->validate([
+            'password' => 'nullable|min:6|max:225|confirmed',
+        ]);
+        $this->user->Edit($id, [
+            'password' => Hash::make($validated['password'])
+        ]);
     }
 }

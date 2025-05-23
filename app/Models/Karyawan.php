@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
 
 class Karyawan extends Model
 {
@@ -31,20 +29,9 @@ class Karyawan extends Model
     public function gaji(){
         return $this->hasMany(Gaji::class);
     }
-    public function Index(Request $request)
+    public function Index()
     {
-        if ($request->ajax()) {
-            DataTables::of($this->with('user','unit','bank')->latest())
-            ->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $url = url('admin/karyawan/'.$row->id);
-                $button = '<a href="'.$url.'" class="btn btn-sm btn-warning">Edit</a>';
-                $button .= '<button class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">Hapus</button>';
-                return $button;
-            })
-            ->rawColumns(['action'])
-            ->make(true);
-        }
+        return $this->latest()->get();
     }
     public function Store($data)
     {

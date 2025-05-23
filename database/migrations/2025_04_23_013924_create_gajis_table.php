@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('periode');
             $table->decimal('uang_apresiasi')->nullable();
             $table->decimal('jumlah_lembur')->nullable();
+            $table->integer('jumlah_hari_kerja');
             $table->decimal('potongan_pajak');
             $table->decimal('potongan_bpjs_kesehatan_institusi');
             $table->decimal('potongan_bpjs_kesehatan');

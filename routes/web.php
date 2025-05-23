@@ -4,38 +4,39 @@ use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\GajiController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
-use App\Models\Bank;
 use App\Models\Gaji;
-use App\Models\Karyawan;
-use App\Models\Unit;
-use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth.login');
+    return inertia('Auth/Login');
 })->name('login');
 Route::post('/', [AutentikasiController::class, 'login']);
 Route::middleware('auth')->group(function () {
-    Route::post('logout', [AutentikasiController::class, 'logout']);
+    Route::get('logout', [AutentikasiController::class, 'logout']);
     Route::get('dashboard', function () {
-        return view('index');
-    });
+        return inertia('Index', [
+            'transaksi' => Gaji::with('karyawan')->limit(5),
+            'totalBulan' => Gaji::whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->sum('total_diterima'),
+            'totalTahun' => Gaji::whereYear('created_at', Carbon::now()->year)->sum('total_diterima')
+        ]);
+    })->name('dashboard');
     //untuk admin
     Route::prefix('admin')->group(function () {
         Route::resource('user', UserController::class);
+        Route::put('user/ubah-password/{id}', [UserController::class, 'Password']);
         Route::resource('bank', BankController::class);
         Route::resource('unit', UnitController::class);
         Route::resource('karyawan', KaryawanController::class);
         Route::resource('gaji', GajiController::class);
     });
-    //Untuk tabel
-    Route::prefix('query')->group(function () {
-        Route::get('user', [User::class, 'Index']);
-        Route::get('unit', [Unit::class, 'Index']);
-        Route::get('bank', [Bank::class, 'Index']);
-        Route::get('karyawan', [Karyawan::class, 'Index']);
-        Route::get('gaji', [Gaji::class, 'Index']);
+    //Finance
+    Route::prefix('finance')->group(function () {
+        Route::resource('gaji', GajiController::class);
     });
+    //untuk semua
+    Route::resource('profil', ProfilController::class);
 });
