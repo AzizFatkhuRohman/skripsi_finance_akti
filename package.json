@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@inertiajs/react": "^2.0.9",
+        "jquery": "^3.7.1",
         "react-dom": "^19.1.0",
         "sweetalert2": "^11.21.1"
     }

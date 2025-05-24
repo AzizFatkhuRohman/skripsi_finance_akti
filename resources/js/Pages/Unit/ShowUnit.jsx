@@ -72,8 +72,8 @@ export default function ShowUnit() {
                             </tr>
                         </thead>
                         <tbody>
-                            {karyawan && data.length > 0 ? (
-                                data.map((item, index) => (
+                            {karyawan && karyawan.length > 0 ? (
+                                karyawan.map((item, index) => (
                                     <tr key={item.id}>
                                         <td>{index + 1}</td>
                                         <td>{item.nama}</td>

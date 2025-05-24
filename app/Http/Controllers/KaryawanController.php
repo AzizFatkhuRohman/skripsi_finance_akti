@@ -21,10 +21,16 @@ class KaryawanController extends Controller
         $this->unit = $unit;
         $this->bank = $bank;
     }
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $data = Karyawan::query()
+        ->when($search,function($q)use($search){
+            $q->where('nik','like',"%{$search}%")->orWhere('jabatan','like',"%{$search}%");
+        })->latest()->paginate(10)->withQueryString();
         return inertia('Karyawan/Karyawan', [
-            'data' => $this->karyawan->Index()
+            'data' => $data,
+            'search'=>$search
         ]);
     }
     public function create()

@@ -13,10 +13,18 @@ class UserController extends Controller
     {
         $this->user = $user;
     }
-    public function index()
+    public function index(Request $request)
     {
-        return inertia('User/User',[
-            'data'=>$this->user->Index()
+        $search = $request->input('search');
+        $data = User::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
+            })
+            ->latest()->paginate(10)->withQueryString();
+        return inertia('User/User', [
+            'data' => $data,
+            'search'=>$search
         ]);
     }
     public function create()
@@ -28,12 +36,12 @@ class UserController extends Controller
         $validated = $request->validate([
             'email' => 'required|max:225|email|unique:users',
             'role' => 'required'
-        ],[
-            'email.required'=>'Email kosong',
-            'email.max'=>'Email maksimum 255 karakter',
-            'email.email'=>'Email harus bertipe mail',
-            'email.unique'=>'Email sudah digunakan',
-            'role.required'=>'Role kosong'
+        ], [
+            'email.required' => 'Email kosong',
+            'email.max' => 'Email maksimum 255 karakter',
+            'email.email' => 'Email harus bertipe mail',
+            'email.unique' => 'Email sudah digunakan',
+            'role.required' => 'Role kosong'
         ]);
         $this->user->Store([
             'email' => $validated['email'],
@@ -53,11 +61,11 @@ class UserController extends Controller
         $validated = $request->validate([
             'email' => 'required|max:225|email',
             'role' => 'required'
-        ],[
-            'email.required'=>'Email kosong',
-            'email.max'=>'Email maksimum 225 karakter',
-            'email.email'=>'Tipe email',
-            'role.required'=>'Role kosong'
+        ], [
+            'email.required' => 'Email kosong',
+            'email.max' => 'Email maksimum 225 karakter',
+            'email.email' => 'Tipe email',
+            'role.required' => 'Role kosong'
         ]);
         $this->user->Edit($id, [
             'email' => $validated['email'],
@@ -70,7 +78,8 @@ class UserController extends Controller
         $this->user->Del($id);
         return back()->with('message', 'User berhasil dihapus');
     }
-    public function Password(Request $request, $id){
+    public function Password(Request $request, $id)
+    {
         $validated = $request->validate([
             'password' => 'nullable|min:6|max:225|confirmed',
         ]);

@@ -15,12 +15,28 @@ class GajiController extends Controller
         $this->gaji = $gaji;
         $this->karyawan = $karyawan;
     }
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
+        $data = Gaji::with('karyawan')
+            ->when($search, function ($q) use ($search) {
+                $q->where('periode', 'like', "%{$search}%")
+                    ->orWhere('total_diterima', 'like', "%{$search}%")
+                    ->orWhereHas('karyawan', function ($query) use ($search) {
+                        $query->where('nama', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return inertia('Gaji/Gaji', [
-            'data' => $this->gaji->Index()
+            'data' => $data,
+            'search' => $search,
         ]);
     }
+
     public function create()
     {
         return inertia('Gaji/CreateGaji', [
@@ -113,7 +129,7 @@ class GajiController extends Controller
             + $request->potongan_jht;
 
         $total_diterima = $bruto - $total_potongan;
-        $this->gaji->Edit($id,[
+        $this->gaji->Edit($id, [
             'periode' => $request->periode,
             'uang_apresiasi' => $request->uang_apresiasi,
             'jumlah_lembur' => $request->jumlah_lembur,

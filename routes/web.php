@@ -4,6 +4,7 @@ use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\GajiController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\LaporanGajiController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
     //Finance
     Route::prefix('finance')->group(function () {
         Route::resource('gaji', GajiController::class);
+    });
+    //Karyawan
+    Route::prefix('karyawan')->group(function(){
+        Route::get('gaji',[LaporanGajiController::class,'index']);
     });
     //untuk semua
     Route::resource('profil', ProfilController::class);

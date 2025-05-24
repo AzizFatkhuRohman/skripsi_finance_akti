@@ -1,12 +1,16 @@
-import { Link, usePage, useForm } from "@inertiajs/react";
-import React, { useState, useEffect } from "react";
-import DeleteButton from "../../Components/DeteleButton";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import React, { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
 
-export default function Bank() {
+export default function GajiKaryawan() {
     const { data } = usePage().props;
-    const banks = data.data || [];
-    const { data: formData, setData, get, processing } = useForm({
+    const gaji = data.data || [];
+    const {
+        data: formData,
+        setData,
+        get,
+        processing,
+    } = useForm({
         search: data.search || "",
     });
     const [typingTimeout, setTypingTimeout] = useState(null);
@@ -16,10 +20,18 @@ export default function Bank() {
         if (typingTimeout) clearTimeout(typingTimeout);
         setTypingTimeout(
             setTimeout(() => {
-                get("/admin/bank", {
+                get("/karyawan/gaji", {
                     preserveState: true,
                     replace: true,
-                    only: ["data", "search", "current_page", "last_page", "per_page", "prev_page_url", "next_page_url"],
+                    only: [
+                        "data",
+                        "search",
+                        "current_page",
+                        "last_page",
+                        "per_page",
+                        "prev_page_url",
+                        "next_page_url",
+                    ],
                     data: {
                         search: value,
                         page: 1,
@@ -33,38 +45,10 @@ export default function Bank() {
             if (typingTimeout) clearTimeout(typingTimeout);
         };
     }, [typingTimeout]);
-
     return (
         <Layout>
             <div className="card">
-                <div className="card-header d-flex justify-content-between">
-                    <h5>Kelola Bank</h5>
-                    <Link href="/admin/bank/create" className="btn btn-primary">
-                        {/* SVG icon */}
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="icon icon-tabler icons-tabler-outline icon-tabler-database-plus"
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3" />
-                            <path d="M4 6v6c0 1.657 3.582 3 8 3c1.075 0 2.1 -.08 3.037 -.224" />
-                            <path d="M20 12v-6" />
-                            <path d="M4 12v6c0 1.657 3.582 3 8 3c.166 0 .331 -.002 .495 -.006" />
-                            <path d="M16 19h6" />
-                            <path d="M19 16v6" />
-                        </svg>
-                    </Link>
-                </div>
                 <div className="card-body table-responsive">
-                    {/* Input Pencarian */}
                     <div className="mb-2 d-flex justify-content-end">
                         <input
                             type="text"
@@ -78,34 +62,32 @@ export default function Bank() {
                             autoComplete="off"
                         />
                     </div>
-
                     <table
                         className="table table-bordered table-hover border-dark"
                         id="bankTable"
                     >
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Kode bank</th>
-                                <th>Nama bank</th>
-                                <th>Aksi</th>
+                                <th scope="col">No</th>
+                                <th scope="col">Periode</th>
+                                <th scope="col">Total dipotong</th>
+                                <th scope="col">Total diterima</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {banks.length > 0 ? (
-                                banks.map((item, index) => (
+                            {gaji && gaji.length > 0 ? (
+                                gaji.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>
-                                            {(data.current_page - 1) * data.per_page + index + 1}
-                                        </td>
-                                        <td>{item.kode_bank}</td>
-                                        <td>{item.nama_bank}</td>
+                                        <td>{index + 1}</td>
+                                        <td>{item.periode}</td>
+                                        <td>{item.total_potongan}</td>
+                                        <td>{item.total_diterima}</td>
                                         <td>
                                             <Link
-                                                href={`/admin/bank/${item.id}`}
-                                                className="btn btn-warning btn-sm me-2"
+                                                href={`/karyawan/gaji/${item.id}`}
+                                                className="btn btn-success btn-sm me-2"
                                             >
-                                                {/* Edit icon */}
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     width="24"
@@ -113,32 +95,33 @@ export default function Bank() {
                                                     viewBox="0 0 24 24"
                                                     fill="none"
                                                     stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="icon icon-tabler icons-tabler-outline icon-tabler-edit"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-eye-star"
                                                 >
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-                                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-                                                    <path d="M16 5l3 3" />
+                                                    <path
+                                                        stroke="none"
+                                                        d="M0 0h24v24H0z"
+                                                        fill="none"
+                                                    />
+                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                                    <path d="M9.608 17.682c-2.558 -.71 -4.76 -2.603 -6.608 -5.682c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                                    <path d="M17.8 20.817l-2.172 1.138a.392 .392 0 0 1 -.568 -.41l.415 -2.411l-1.757 -1.707a.389 .389 0 0 1 .217 -.665l2.428 -.352l1.086 -2.193a.392 .392 0 0 1 .702 0l1.086 2.193l2.428 .352a.39 .39 0 0 1 .217 .665l-1.757 1.707l.414 2.41a.39 .39 0 0 1 -.567 .411l-2.172 -1.138z" />
                                                 </svg>
                                             </Link>
-                                            <DeleteButton href="/admin/bank" itemId={item.id} />
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="text-center">
-                                        Tidak ada data bank.
+                                    <td colSpan="5" className="text-center">
+                                        Tidak ada data gaji.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
-
-                    {/* Pagination */}
                     <div className="mt-3 d-flex justify-content-end gap-2">
                         {data.prev_page_url && (
                             <Link

@@ -1,9 +1,50 @@
-import { Link, usePage } from "@inertiajs/react";
-import React from "react";
-import Layout from "../Layout/Layout";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import React, { useEffect, useState } from "react";
 import DeleteButton from "../../Components/DeteleButton";
+import Layout from "../Layout/Layout";
 export default function Unit() {
     const { data } = usePage().props;
+    const unit = data.data || [];
+    const {
+        data: formData,
+        setData,
+        get,
+        processing,
+    } = useForm({
+        search: data.search || "",
+    });
+    const [typingTimeout, setTypingTimeout] = useState(null);
+    function handleSearchChange(e) {
+        const value = e.target.value;
+        setData("search", value);
+        if (typingTimeout) clearTimeout(typingTimeout);
+        setTypingTimeout(
+            setTimeout(() => {
+                get("/admin/unit", {
+                    preserveState: true,
+                    replace: true,
+                    only: [
+                        "data",
+                        "search",
+                        "current_page",
+                        "last_page",
+                        "per_page",
+                        "prev_page_url",
+                        "next_page_url",
+                    ],
+                    data: {
+                        search: value,
+                        page: 1,
+                    },
+                });
+            }, 500)
+        );
+    }
+    useEffect(() => {
+        return () => {
+            if (typingTimeout) clearTimeout(typingTimeout);
+        };
+    }, [typingTimeout]);
     return (
         <>
             <Layout>
@@ -19,20 +60,41 @@ export default function Unit() {
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
-                                fill="currentColor"
-                                className="icon icon-tabler icons-tabler-filled icon-tabler-copy-plus"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="icon icon-tabler icons-tabler-outline icon-tabler-database-plus"
                             >
                                 <path
                                     stroke="none"
                                     d="M0 0h24v24H0z"
                                     fill="none"
                                 />
-                                <path d="M18.333 6a3.667 3.667 0 0 1 3.667 3.667v8.666a3.667 3.667 0 0 1 -3.667 3.667h-8.666a3.667 3.667 0 0 1 -3.667 -3.667v-8.666a3.667 3.667 0 0 1 3.667 -3.667zm-4.333 4a1 1 0 0 0 -1 1v2h-2a1 1 0 0 0 -.993 .883l-.007 .117a1 1 0 0 0 1 1h2v2a1 1 0 0 0 .883 .993l.117 .007a1 1 0 0 0 1 -1v-2h2a1 1 0 0 0 .993 -.883l.007 -.117a1 1 0 0 0 -1 -1h-2v-2a1 1 0 0 0 -.883 -.993zm1 -8c1.094 0 1.828 .533 2.374 1.514a1 1 0 1 1 -1.748 .972c-.221 -.398 -.342 -.486 -.626 -.486h-10c-.548 0 -1 .452 -1 1v9.998c0 .32 .154 .618 .407 .805l.1 .065a1 1 0 1 1 -.99 1.738a3 3 0 0 1 -1.517 -2.606v-10c0 -1.652 1.348 -3 3 -3z" />
-                            </svg>{" "}
-                            Tambah
+                                <path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3" />
+                                <path d="M4 6v6c0 1.657 3.582 3 8 3c1.075 0 2.1 -.08 3.037 -.224" />
+                                <path d="M20 12v-6" />
+                                <path d="M4 12v6c0 1.657 3.582 3 8 3c.166 0 .331 -.002 .495 -.006" />
+                                <path d="M16 19h6" />
+                                <path d="M19 16v6" />
+                            </svg>
                         </Link>
                     </div>
-                    <div className="card-body">
+                    <div className="card-body tale-responsive">
+                        <div className="mb-2 d-flex justify-content-end">
+                            <input
+                                type="text"
+                                name="search"
+                                className="form-control form-control-sm w-auto"
+                                placeholder="Cari..."
+                                style={{ minWidth: "200px" }}
+                                value={formData.search}
+                                onChange={handleSearchChange}
+                                disabled={processing}
+                                autoComplete="off"
+                            />
+                        </div>
                         <table className="table table-bordered table-hover border-dark">
                             <thead>
                                 <tr>
@@ -42,8 +104,8 @@ export default function Unit() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {data && data.length > 0 ? (
-                                    data.map((item, index) => (
+                                {unit && unit.length > 0 ? (
+                                    unit.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>{index + 1}</td>
                                             <td>{item.nama_unit}</td>
@@ -74,7 +136,10 @@ export default function Unit() {
                                                         <path d="M16 5l3 3" />
                                                     </svg>
                                                 </Link>
-                                                <DeleteButton href="/admin/unit" itemId={item.id} />
+                                                <DeleteButton
+                                                    href="/admin/unit"
+                                                    itemId={item.id}
+                                                />
                                             </td>
                                         </tr>
                                     ))
@@ -87,6 +152,48 @@ export default function Unit() {
                                 )}
                             </tbody>
                         </table>
+                        <div className="mt-3 d-flex justify-content-end gap-2">
+                        {data.prev_page_url && (
+                            <Link
+                                href={data.prev_page_url}
+                                className="btn btn-secondary"
+                                as="button"
+                                method="get"
+                                preserveState
+                            >
+                                Previous
+                            </Link>
+                        )}
+
+                        {[...Array(data.last_page)].map((_, i) => (
+                            <Link
+                                key={i + 1}
+                                href={`?page=${i + 1}`}
+                                className={`btn ${
+                                    data.current_page === i + 1
+                                        ? "btn-primary"
+                                        : "btn-outline-secondary"
+                                }`}
+                                as="button"
+                                method="get"
+                                preserveState
+                            >
+                                {i + 1}
+                            </Link>
+                        ))}
+
+                        {data.next_page_url && (
+                            <Link
+                                href={data.next_page_url}
+                                className="btn btn-secondary"
+                                as="button"
+                                method="get"
+                                preserveState
+                            >
+                                Next
+                            </Link>
+                        )}
+                    </div>
                     </div>
                 </div>
             </Layout>

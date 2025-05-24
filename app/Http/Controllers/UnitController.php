@@ -13,10 +13,19 @@ class UnitController extends Controller
     {
         $this->unit = $unit;
     }
-    public function index()
+    public function index(Request $request)
     {
-        return inertia('Unit/Unit',[
-            'data'=>$this->unit->Index()
+        $search = $request->input('search');
+        $data = Unit::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('nama_unit', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+        return inertia('Unit/Unit', [
+            'data' => $data,
+            'search'=>$search
         ]);
     }
     public function create()
@@ -39,7 +48,7 @@ class UnitController extends Controller
     {
         return inertia('Unit/ShowUnit', [
             'data' => $this->unit->Show($id),
-            'karyawan'=>Karyawan::where('unit_id',$id)->get()
+            'karyawan' => Karyawan::where('unit_id', $id)->latest()->get()
         ]);
     }
     public function update(Request $request, $id)
