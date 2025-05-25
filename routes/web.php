@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\CetakController;
 use App\Http\Controllers\GajiController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\LaporanGajiController;
@@ -41,6 +42,7 @@ Route::middleware('auth')->group(function () {
     //Karyawan
     Route::prefix('karyawan')->group(function(){
         Route::get('gaji',[LaporanGajiController::class,'index']);
+        Route::get('gaji/{id}',[CetakController::class,'index']);
     });
     //untuk semua
     Route::resource('profil', ProfilController::class);

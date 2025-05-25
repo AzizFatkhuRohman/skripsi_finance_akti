@@ -9,15 +9,21 @@ use Illuminate\Support\Facades\Auth;
 
 class CetakController extends Controller
 {
-    public function index($id)
-    {
-        $karyawan = Karyawan::where('user_id',Auth::user()->id)->first();
-        $tanggal = now()->format('d-m-Y');
+    public function index($id){
         $data = Gaji::with('karyawan')->find($id);
-        $pdf = Pdf::loadView('cetak.index',[
+        return inertia('Cetak/ShowGajiKaryawan',[
             'data'=>$data
         ]);
-        $namaPdf = 'LaporanGaji'. str_replace(' ','-',$karyawan->nama).$tanggal.'pdf';
-        return $pdf->stream($namaPdf);
     }
+    // public function index($id)
+    // {
+    //     $karyawan = Karyawan::where('user_id',Auth::user()->id)->first();
+    //     $tanggal = now()->format('d-m-Y');
+    //     $data = Gaji::with('karyawan')->find($id);
+    //     $pdf = Pdf::loadView('cetak.index',[
+    //         'data'=>$data
+    //     ]);
+    //     $namaPdf = 'LaporanGaji'. str_replace(' ','-',$karyawan->nama).$tanggal.'pdf';
+    //     return $pdf->stream($namaPdf);
+    // }
 }
